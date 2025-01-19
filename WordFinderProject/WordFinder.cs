@@ -2,7 +2,8 @@
 {
     public class WordFinder
 {
-    private readonly char[,] _matrix;
+    private readonly string[] _matrixColumns;
+    private readonly string[] _matrixRows;
     private readonly int _rows;
     private readonly int _cols;
 
@@ -11,17 +12,15 @@
         var matrixList = matrix.ToList();
         _rows = matrixList.Count;
         _cols = matrixList[0].Length;
-        _matrix = new char[_rows, _cols];
-
-        // Convert string matrix to char[,] for better performance
-        for (int i = 0; i < _rows; i++)
+        _matrixColumns = new string[_cols];
+        _matrixRows = matrix.ToArray();
+        for (int i = 0; i < _cols; i++)
         {
-            for (int j = 0; j < _cols; j++)
-            {
-                //Add the character to the matrix
-                _matrix[i, j] = matrixList[i][j];
-            }
+            _matrixColumns[i] = new string(Enumerable.Range(0, _rows)
+                .Select(j => matrixList[j][i])
+                .ToArray());
         }
+
     }
 
     public IEnumerable<string> Find(IEnumerable<string> wordstream)
@@ -39,23 +38,15 @@
             // Search horizontally
             for (int i = 0; i < _rows; i++)
             {
-                //Create a string of the row
-                var row = new string(Enumerable.Range(0, _cols)
-                    .Select(j => _matrix[i, j])
-                    .ToArray());
                 //Count the number of times the word appears in the row
-                count += CountOccurrences(row, word);
+                count += CountOccurrences(_matrixRows[i], word);
             }
 
             // Search vertically
             for (int j = 0; j < _cols; j++)
             {
-                //Create a string of the column
-                var column = new string(Enumerable.Range(0, _rows)
-                    .Select(i => _matrix[i, j])
-                    .ToArray());
                 //Count the number of times the word appears in the column
-                count += CountOccurrences(column, word);
+                count += CountOccurrences(_matrixColumns[j], word);
             }
 
             //If the word appears more than 0 times, add it to the dictionary
